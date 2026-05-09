@@ -1,5 +1,17 @@
-{"properties": [{
-  "name": "api.security.token.secret",
-  "type": "java.lang.String",
-  "description": "A secret key used for signing JWT tokens. It should be a long and secure string to ensure the integrity and security of the tokens. The value can be set through the application properties or environment variable JWT_SECRET."
-}]}
+{"properties": [
+  {
+    "name": "api.security.token.secret",
+    "type": "java.lang.String",
+    "description": "A secret key used for signing JWT tokens. It should be a long and secure string to ensure the integrity and security of the tokens. The value can be set through the application properties or environment variable JWT_SECRET."
+  },
+  {
+    "name": "api.default.admin.email",
+    "type": "java.lang.String",
+    "description": "A default email address for the admin user. This value can be set through the application properties or environment variable DEFAULT_EMAIL. It is used by the AdminSeeder to create an admin user if one does not already exist in the database."
+  },
+  {
+    "name": "api.default.admin.senha",
+    "type": "java.lang.String",
+    "description": "A default password for the admin user. This value can be set through the application properties or environment variable DEFAULT_SENHA. It is used by the AdminSeeder to create an admin user if one does not already exist in the database."
+  }
+]}
