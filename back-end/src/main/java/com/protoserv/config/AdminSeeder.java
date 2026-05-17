@@ -1,6 +1,5 @@
 package com.protoserv.config;
 
-import com.protoserv.model.Perfil;
 import com.protoserv.model.Usuario;
 import com.protoserv.repository.UsuarioRepository;
 import org.slf4j.Logger;
@@ -42,11 +41,7 @@ public class AdminSeeder implements CommandLineRunner {
             usuarioRepository.findByEmail(adminEmail).ifPresentOrElse(
                     usuario -> log.info("Admin padrão já existe no banco de dados. Pulando etapa de criação."),
                     () -> {
-                        Usuario novoAdmin = new Usuario();
-                        novoAdmin.setNome("Administrador do Sistema");
-                        novoAdmin.setEmail(adminEmail);
-                        novoAdmin.setSenha(passwordEncoder.encode(adminSenha));
-                        novoAdmin.setPerfil(Perfil.ADMIN);
+                        Usuario novoAdmin = Usuario.criarAdmin("Administrador do Sistema", adminEmail, passwordEncoder.encode(adminSenha));
                         
                         usuarioRepository.save(novoAdmin);
                         log.info("Usuário Administrador padrão gerado com sucesso!");

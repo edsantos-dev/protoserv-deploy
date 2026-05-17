@@ -43,6 +43,17 @@ public class Usuario implements UserDetails {
         this.senha = senha;
     }
 
+    public Usuario(String nome, String email, String senha, Perfil perfil) {
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.perfil = perfil;
+    }
+
+    public static Usuario criarAdmin(String nome, String email, String senha) {
+        return new Usuario(nome, email, senha, Perfil.ADMIN);
+    }
+
     public void inativar() {
         if (this.status == StatusUsuario.INATIVO) {
             throw new IllegalArgumentException("O usuário já está inativo.");
