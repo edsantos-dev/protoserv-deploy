@@ -1,13 +1,20 @@
 package com.protoserv.controller;
 
+import com.protoserv.dto.request.DadosAlterarSenhaDTO;
 import com.protoserv.dto.response.DadosListagemUsuarioDTO;
+import com.protoserv.dto.response.DadosPerfilDTO;
 import com.protoserv.model.StatusUsuario;
 import com.protoserv.service.UsuarioService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -43,6 +50,21 @@ public class UsuarioController {
     public ResponseEntity<Void> ativar(@PathVariable Long id) {
         usuarioService.ativarUsuario(id);
         
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<DadosPerfilDTO> meuPerfil(@AuthenticationPrincipal UserDetails userDetails) {
+        DadosPerfilDTO perfil = usuarioService.obterPerfilLogado(userDetails.getUsername());
+        return ResponseEntity.ok(perfil);
+    }
+
+    @PatchMapping("/me/senha")
+    public ResponseEntity<Void> alterarMinhaSenha(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody @Valid DadosAlterarSenhaDTO dto) {
+        
+        usuarioService.alterarSenha(userDetails.getUsername(), dto);
         return ResponseEntity.noContent().build();
     }
 }

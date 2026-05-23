@@ -70,6 +70,13 @@ public class Usuario implements UserDetails {
         this.status = StatusUsuario.ATIVO;
     }
 
+    public void atualizarSenha(String novaSenhaCriptografada) {
+        if (novaSenhaCriptografada == null || novaSenhaCriptografada.isBlank()) {
+            throw new IllegalArgumentException("A nova senha não pode ser nula ou vazia no domínio.");
+        }
+        this.senha = novaSenhaCriptografada;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(perfil.name()));
