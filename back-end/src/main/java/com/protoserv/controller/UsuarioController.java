@@ -1,6 +1,7 @@
 package com.protoserv.controller;
 
 import com.protoserv.dto.request.DadosAlterarSenhaDTO;
+import com.protoserv.dto.request.DadosEdicaoUsuarioAdminDTO;
 import com.protoserv.dto.request.DadosEdicaoUsuarioDTO;
 import com.protoserv.dto.response.DadosListagemUsuarioDTO;
 import com.protoserv.dto.response.DadosPerfilDTO;
@@ -77,5 +78,16 @@ public class UsuarioController {
         DadosPerfilDTO perfilAtualizado = usuarioService.atualizarDadosUsuario(userDetails.getUsername(), dto);
         
         return ResponseEntity.ok(perfilAtualizado);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<DadosPerfilDTO> atualizarUsuario(
+            @PathVariable Long id,
+            @RequestBody @Valid DadosEdicaoUsuarioAdminDTO dto) {
+        
+        DadosPerfilDTO usuarioAtualizado = usuarioService.atualizarUsuarioPeloAdmin(id, dto);
+        
+        return ResponseEntity.ok(usuarioAtualizado);
     }
 }
