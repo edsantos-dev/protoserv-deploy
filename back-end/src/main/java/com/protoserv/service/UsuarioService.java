@@ -1,8 +1,12 @@
 package com.protoserv.service;
 
 import com.protoserv.dto.request.DadosAlterarSenhaDTO;
+import com.protoserv.dto.request.DadosCriarUsuarioDTO;
+import com.protoserv.dto.request.DadosEdicaoUsuarioAdminDTO;
+import com.protoserv.dto.request.DadosEdicaoUsuarioDTO;
 import com.protoserv.dto.response.DadosListagemUsuarioDTO;
 import com.protoserv.dto.response.DadosPerfilDTO;
+import com.protoserv.model.Perfil;
 import com.protoserv.model.StatusUsuario;
 import com.protoserv.model.Usuario;
 import com.protoserv.repository.UsuarioRepository;
@@ -22,6 +26,22 @@ public class UsuarioService {
     public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public DadosPerfilDTO criarUsuario(DadosCriarUsuarioDTO dados) {
+        if (usuarioRepository.findByEmail(dados.email()).isPresent()) {
+            throw new IllegalArgumentException("O e-mail já está em uso.");
+        }
+
+        Perfil perfilUsuario = Perfil.valueOf(dados.perfil().toUpperCase());
+        
+        String senhaCriptografada = passwordEncoder.encode(dados.senha());
+
+        Usuario usuario = new Usuario(dados.nome(), dados.email(), senhaCriptografada, perfilUsuario);
+        
+        usuarioRepository.save(usuario);
+
+        return new DadosPerfilDTO(usuario);
     }
 
     public Page<DadosListagemUsuarioDTO> listarUsuario(StatusUsuario status, Pageable paginacao) {
@@ -69,6 +89,27 @@ public class UsuarioService {
 
         String novaSenhaCriptografada = passwordEncoder.encode(dto.novaSenha());
         usuario.atualizarSenha(novaSenhaCriptografada);
+    }
+
+    @Transactional
+    public DadosPerfilDTO atualizarDadosUsuario(String email, DadosEdicaoUsuarioDTO dadosEdicao) {
+        Usuario usuario = buscarPorEmail(email);
+
+        usuario.atualizarDadosUsuario(dadosEdicao.nome());
+
+        return new DadosPerfilDTO(usuario);
+    }
+
+    @Transactional
+    public DadosPerfilDTO atualizarUsuarioPeloAdmin(Long id, DadosEdicaoUsuarioAdminDTO dadosEdicao) {
+        Usuario usuario = buscarUsuario(id);
+
+        Perfil perfilEnum = Perfil.valueOf(dadosEdicao.perfil().toUpperCase());
+
+        usuario.atualizarDadosUsuario(dadosEdicao.nome());
+        usuario.alterarDadosUsuarioPerfilAdmin(perfilEnum);
+
+        return new DadosPerfilDTO(usuario);
     }
 
     private Usuario buscarPorEmail(String email) {

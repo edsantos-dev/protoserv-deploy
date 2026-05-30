@@ -1,6 +1,9 @@
 package com.protoserv.controller;
 
 import com.protoserv.dto.request.DadosAlterarSenhaDTO;
+import com.protoserv.dto.request.DadosCriarUsuarioDTO;
+import com.protoserv.dto.request.DadosEdicaoUsuarioAdminDTO;
+import com.protoserv.dto.request.DadosEdicaoUsuarioDTO;
 import com.protoserv.dto.response.DadosListagemUsuarioDTO;
 import com.protoserv.dto.response.DadosPerfilDTO;
 import com.protoserv.model.StatusUsuario;
@@ -16,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -25,6 +29,19 @@ public class UsuarioController {
 
     public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<DadosPerfilDTO> criarUsuario(
+            @RequestBody @Valid DadosCriarUsuarioDTO dto,
+            UriComponentsBuilder uriBuilder) {
+        
+        DadosPerfilDTO novoUsuario = usuarioService.criarUsuario(dto);
+        
+        var uri = uriBuilder.path("/api/usuarios/{id}").buildAndExpand(novoUsuario.id()).toUri();
+        
+        return ResponseEntity.created(uri).body(novoUsuario);
     }
 
     @GetMapping
@@ -66,5 +83,26 @@ public class UsuarioController {
         
         usuarioService.alterarSenha(userDetails.getUsername(), dto);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<DadosPerfilDTO> atualizarMeuPerfil(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody @Valid DadosEdicaoUsuarioDTO dto) {
+        
+        DadosPerfilDTO perfilAtualizado = usuarioService.atualizarDadosUsuario(userDetails.getUsername(), dto);
+        
+        return ResponseEntity.ok(perfilAtualizado);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<DadosPerfilDTO> atualizarUsuario(
+            @PathVariable Long id,
+            @RequestBody @Valid DadosEdicaoUsuarioAdminDTO dto) {
+        
+        DadosPerfilDTO usuarioAtualizado = usuarioService.atualizarUsuarioPeloAdmin(id, dto);
+        
+        return ResponseEntity.ok(usuarioAtualizado);
     }
 }
