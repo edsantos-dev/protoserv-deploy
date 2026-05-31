@@ -1,9 +1,12 @@
 package com.protoserv.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.protoserv.dto.request.DadosCriarServicoDTO;
+import com.protoserv.dto.response.DadosListagemServicoDTO;
 import com.protoserv.dto.response.DadosServicoDTO;
 import com.protoserv.model.CategoriaServico;
 import com.protoserv.model.Servico;
@@ -37,5 +40,15 @@ public class ServicoService {
         servicoRepository.save(servico);
 
         return new DadosServicoDTO(servico);
+    }
+
+    public Page<DadosListagemServicoDTO> listarServicos(String busca, Pageable paginacao) {
+        String termoBusca = "";
+        
+        if (busca != null) {
+            termoBusca = busca.trim();
+        }
+
+        return servicoRepository.findByAtivoTrueAndNomeContainingIgnoreCase(termoBusca, paginacao).map(DadosListagemServicoDTO::new);
     }
 }
