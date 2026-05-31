@@ -1,6 +1,7 @@
 package com.protoserv.controller;
 
 import com.protoserv.dto.request.DadosCriarServicoDTO;
+import com.protoserv.dto.request.DadosEdicaoServicoDTO;
 import com.protoserv.dto.response.DadosListagemServicoDTO;
 import com.protoserv.dto.response.DadosServicoDTO;
 import com.protoserv.service.ServicoService;
@@ -50,5 +51,29 @@ public class ServicoController {
         var servico = servicoService.detalharServico(id);
         
         return ResponseEntity.ok(servico);
+    }
+
+    @PutMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<DadosServicoDTO> atualizarServico(@RequestBody @Valid DadosEdicaoServicoDTO dados) {
+        var servicoAtualizado = servicoService.atualizarServico(dados);
+
+        return ResponseEntity.ok(servicoAtualizado);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Void> desativarServico(@PathVariable Long id) {
+        servicoService.desativarServico(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/ativar")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Void> ativarServico(@PathVariable Long id) {
+        servicoService.ativarServico(id);
+        
+        return ResponseEntity.noContent().build();
     }
 }
