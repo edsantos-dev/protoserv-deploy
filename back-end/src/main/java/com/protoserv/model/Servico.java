@@ -1,5 +1,7 @@
 package com.protoserv.model;
 
+import com.protoserv.dto.request.DadosEdicaoServicoDTO;
+
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -38,15 +40,22 @@ public class Servico {
         this.ativo = true;
     }
 
-    public void atualizarDados(String novoNome, String novaDescricao, Integer novoPrazo, CategoriaServico novaCategoria, String novaOrientacao) {
-        if (novoPrazo != null && novoPrazo < 0) {
-            throw new IllegalArgumentException("O prazo em dias não pode ser negativo.");
+    public void atualizarDados(DadosEdicaoServicoDTO dados, CategoriaServico novaCategoria) {
+        if (dados.nome() != null && !dados.nome().isBlank()) {
+            this.nome = dados.nome();
         }
-        this.nome = novoNome;
-        this.descricao = novaDescricao;
-        this.prazoDias = novoPrazo;
-        this.categoria = novaCategoria;
-        this.orientacaoCidadao = novaOrientacao;
+        if (dados.descricao() != null && !dados.descricao().isBlank()) {
+            this.descricao = dados.descricao();
+        }
+        if (dados.prazoDias() != null) {
+            this.prazoDias = dados.prazoDias();
+        }
+        if (novaCategoria != null) {
+            this.categoria = novaCategoria;
+        }
+        if (dados.orientacaoCidadao() != null && !dados.orientacaoCidadao().isBlank()) {
+            this.orientacaoCidadao = dados.orientacaoCidadao();
+        }
     }
 
     public void desativar() {
