@@ -12,6 +12,8 @@ import com.protoserv.model.CategoriaServico;
 import com.protoserv.model.Servico;
 import com.protoserv.repository.ServicoRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class ServicoService {
 
@@ -50,5 +52,12 @@ public class ServicoService {
         }
 
         return servicoRepository.findByAtivoTrueAndNomeContainingIgnoreCase(termoBusca, paginacao).map(DadosListagemServicoDTO::new);
+    }
+
+    public DadosServicoDTO detalharServico(Long id) {
+        var servico = servicoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Serviço não encontrado na base de dados."));
+
+        return new DadosServicoDTO(servico);
     }
 }
