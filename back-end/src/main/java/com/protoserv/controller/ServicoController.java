@@ -44,4 +44,11 @@ public class ServicoController {
         
         return ResponseEntity.ok(page);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DadosServicoDTO> detalharServico(@PathVariable Long id) {
+        var servico = servicoService.detalharServico(id);
+        
+        return ResponseEntity.ok(servico);
+    }
 }
