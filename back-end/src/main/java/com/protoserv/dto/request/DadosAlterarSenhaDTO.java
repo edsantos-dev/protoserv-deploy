@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record DadosAlterarSenhaDTO(
+        
         @NotBlank(message = "A senha atual é obrigatória.")
         String senhaAtual,
         

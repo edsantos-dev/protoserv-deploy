@@ -39,7 +39,7 @@ public class UsuarioController {
         
         DadosPerfilDTO novoUsuario = usuarioService.criarUsuario(dto);
         
-        var uri = uriBuilder.path("/api/usuarios/{id}").buildAndExpand(novoUsuario.id()).toUri();
+        var uri = uriBuilder.path("/usuarios/{id}").buildAndExpand(novoUsuario.id()).toUri();
         
         return ResponseEntity.created(uri).body(novoUsuario);
     }
