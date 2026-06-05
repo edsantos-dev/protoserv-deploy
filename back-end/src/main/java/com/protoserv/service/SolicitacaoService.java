@@ -102,6 +102,20 @@ public class SolicitacaoService {
         return paginaDeSolicitacoes.map(DadosListagemSolicitacaoDTO::new);
     }
 
+    @Transactional
+    public DadosSolicitacaoDTO assumirSolicitacao(Long id) {
+        var solicitacao = solicitacaoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Solicitação não encontrada."));
+
+        String emailUsuarioLogado = SecurityContextHolder.getContext().getAuthentication().getName();
+        var atendenteLogado = usuarioRepository.findByEmail(emailUsuarioLogado)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário logado não encontrado no banco de dados."));
+
+        solicitacao.assumir(atendenteLogado);
+
+        return new DadosSolicitacaoDTO(solicitacao);
+    }
+
     private String gerarProtocoloUnico() {
         String dataHoje = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String codigoAleatorio = UUID.randomUUID().toString().substring(0, 6).toUpperCase(); 
