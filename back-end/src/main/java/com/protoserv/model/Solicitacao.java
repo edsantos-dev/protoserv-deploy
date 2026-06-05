@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -48,6 +50,9 @@ public class Solicitacao {
     @JoinColumn(name = "atendente_id")
     private Usuario atendente;
 
+    @OneToMany(mappedBy = "solicitacao", cascade = CascadeType.ALL)
+    private List<Acompanhamento> acompanhamentos = new ArrayList<>();
+
     public Solicitacao(String protocolo, String descricao, Endereco endereco, Servico servico, Usuario cidadao, String anexoUrl) {
         this.protocolo = protocolo;
         this.descricao = descricao;
@@ -70,5 +75,36 @@ public class Solicitacao {
         
         this.atendente = atendente;
         this.status = StatusSolicitacao.EM_ANDAMENTO;
+    }
+
+    public void adicionarAcompanhamento(String descricao, Usuario autor) {
+        Acompanhamento novoAcompanhamento = new Acompanhamento(this, autor, descricao);
+        this.acompanhamentos.add(novoAcompanhamento);
+    }
+
+
+    public void atualizarStatus(StatusSolicitacao novoStatus) {
+        if (novoStatus == null) {
+            throw new IllegalArgumentException("O novo status não pode ser nulo.");
+        }
+
+        if (novoStatus == this.status) {
+            throw new IllegalStateException("O status da solicitação já é " + novoStatus + ".");
+            
+        }
+
+        if (this.status == StatusSolicitacao.CANCELADA || this.status == StatusSolicitacao.CONCLUIDA) {
+            throw new IllegalStateException("Não é possível alterar o status de uma solicitação que já foi concluída ou cancelada.");
+        }
+
+        if (novoStatus != StatusSolicitacao.NOVO) {
+            this.status = novoStatus;
+        }else {
+            throw new IllegalStateException("O status só pode ser alterado para EM_ANDAMENTO, CONCLUIDA ou CANCELADA.");
+        }
+        
+        if (novoStatus == StatusSolicitacao.CONCLUIDA || novoStatus == StatusSolicitacao.CANCELADA) {
+            this.dataConclusao = LocalDateTime.now();
+        }
     }
 }
