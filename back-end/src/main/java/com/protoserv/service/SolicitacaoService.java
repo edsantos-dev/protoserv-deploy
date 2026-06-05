@@ -1,6 +1,7 @@
 package com.protoserv.service;
 
 import com.protoserv.dto.request.DadosAberturaSolicitacaoDTO;
+import com.protoserv.dto.response.DadosListagemSolicitacaoDTO;
 import com.protoserv.dto.response.DadosSolicitacaoDTO;
 import com.protoserv.model.Endereco;
 import com.protoserv.model.Solicitacao;
@@ -9,6 +10,9 @@ import com.protoserv.repository.ServicoRepository;
 import com.protoserv.repository.SolicitacaoRepository;
 import com.protoserv.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,6 +87,19 @@ public class SolicitacaoService {
         solicitacaoRepository.save(solicitacao);
 
         return new DadosSolicitacaoDTO(solicitacao);
+    }
+
+    public Page<DadosListagemSolicitacaoDTO> listarSolicitacoes(StatusSolicitacao status, Pageable paginacao) {
+        
+        Page<Solicitacao> paginaDeSolicitacoes;
+
+        if (status != null) {
+            paginaDeSolicitacoes = solicitacaoRepository.findAllByStatus(status, paginacao);
+        } else {
+            paginaDeSolicitacoes = solicitacaoRepository.findAll(paginacao);
+        }
+
+        return paginaDeSolicitacoes.map(DadosListagemSolicitacaoDTO::new);
     }
 
     private String gerarProtocoloUnico() {
