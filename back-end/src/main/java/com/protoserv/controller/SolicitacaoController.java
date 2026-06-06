@@ -78,7 +78,16 @@ public class SolicitacaoController {
     @GetMapping("/{id}")
     public ResponseEntity<DadosSolicitacaoDTO> detalhar(@PathVariable Long id) {
         var detalhamento = solicitacaoService.detalharSolicitacao(id);
-        
+
         return ResponseEntity.ok(detalhamento);
+    }
+
+    @GetMapping("/minhas")
+    @PreAuthorize("hasAuthority('CIDADAO')")
+    public ResponseEntity<Page<DadosListagemSolicitacaoDTO>> listarMinhas(@PageableDefault(size = 10, sort = {"dataAbertura"}) Pageable paginacao) {
+        
+        var pagina = solicitacaoService.listarMinhasSolicitacoes(paginacao);
+
+        return ResponseEntity.ok(pagina);
     }
 }

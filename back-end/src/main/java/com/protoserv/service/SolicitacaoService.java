@@ -103,6 +103,14 @@ public class SolicitacaoService {
         return paginaDeSolicitacoes.map(DadosListagemSolicitacaoDTO::new);
     }
 
+    public Page<DadosListagemSolicitacaoDTO> listarMinhasSolicitacoes(Pageable paginacao) {
+        var cidadaoLogado = buscarUsuarioLogado();
+        
+        Page<Solicitacao> paginaDeSolicitacoes = solicitacaoRepository.findAllByCidadaoId(cidadaoLogado.getId(), paginacao);
+        
+        return paginaDeSolicitacoes.map(DadosListagemSolicitacaoDTO::new);
+    }
+
     @Transactional
     public DadosSolicitacaoDTO assumirSolicitacao(Long id) {
         var solicitacao = buscarSolicitacao(id);
