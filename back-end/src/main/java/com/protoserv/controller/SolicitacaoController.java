@@ -49,7 +49,7 @@ public class SolicitacaoController {
     @PreAuthorize("hasAnyAuthority('ATENDENTE', 'ADMIN')")
     public ResponseEntity<Page<DadosListagemSolicitacaoDTO>> listar(
             @RequestParam(required = false) StatusSolicitacao status,
-            @PageableDefault(size = 10, sort = {"dataAbertura"}) Pageable paginacao) {
+            @PageableDefault(size = 10, sort = {"dataAbertura, desc"}) Pageable paginacao) {
 
         var pagina = solicitacaoService.listarSolicitacoes(status, paginacao);
         
@@ -84,7 +84,7 @@ public class SolicitacaoController {
 
     @GetMapping("/minhas")
     @PreAuthorize("hasAuthority('CIDADAO')")
-    public ResponseEntity<Page<DadosListagemSolicitacaoDTO>> listarMinhas(@PageableDefault(size = 10, sort = {"dataAbertura"}) Pageable paginacao) {
+    public ResponseEntity<Page<DadosListagemSolicitacaoDTO>> listarMinhas(@PageableDefault(size = 10, sort = {"dataAbertura, desc"}) Pageable paginacao) {
         
         var pagina = solicitacaoService.listarMinhasSolicitacoes(paginacao);
 
