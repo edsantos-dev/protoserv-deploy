@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.protoserv.dto.request.DadosAberturaSolicitacaoDTO;
+import com.protoserv.dto.request.DadosNovoAcompanhamentoDTO;
 import com.protoserv.dto.response.DadosListagemSolicitacaoDTO;
 import com.protoserv.dto.response.DadosSolicitacaoDTO;
 import com.protoserv.model.StatusSolicitacao;
@@ -59,6 +60,17 @@ public class SolicitacaoController {
     @PreAuthorize("hasAnyAuthority('ATENDENTE')")
     public ResponseEntity<DadosSolicitacaoDTO> assumir(@PathVariable Long id) {
         var solicitacaoAtualizada = solicitacaoService.assumirSolicitacao(id);
+
+        return ResponseEntity.ok(solicitacaoAtualizada);
+    }
+
+    @PostMapping("/{id}/acompanhamentos")
+    @PreAuthorize("hasAnyAuthority('ATENDENTE')") 
+    public ResponseEntity<DadosSolicitacaoDTO> adicionarAcompanhamento(
+            @PathVariable Long id,
+            @RequestBody @Valid DadosNovoAcompanhamentoDTO dados) {
+        
+        var solicitacaoAtualizada = solicitacaoService.adicionarAcompanhamento(id, dados);
 
         return ResponseEntity.ok(solicitacaoAtualizada);
     }
