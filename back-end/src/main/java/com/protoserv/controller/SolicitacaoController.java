@@ -74,4 +74,11 @@ public class SolicitacaoController {
 
         return ResponseEntity.ok(solicitacaoAtualizada);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DadosSolicitacaoDTO> detalhar(@PathVariable Long id) {
+        var detalhamento = solicitacaoService.detalharSolicitacao(id);
+        
+        return ResponseEntity.ok(detalhamento);
+    }
 }
