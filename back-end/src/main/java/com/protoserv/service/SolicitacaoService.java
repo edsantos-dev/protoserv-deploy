@@ -5,6 +5,7 @@ import com.protoserv.dto.request.DadosNovoAcompanhamentoDTO;
 import com.protoserv.dto.response.DadosListagemSolicitacaoDTO;
 import com.protoserv.dto.response.DadosSolicitacaoDTO;
 import com.protoserv.model.Endereco;
+import com.protoserv.model.Perfil;
 import com.protoserv.model.Solicitacao;
 import com.protoserv.model.StatusSolicitacao;
 import com.protoserv.model.Usuario;
@@ -15,6 +16,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -117,6 +119,12 @@ public class SolicitacaoService {
         var solicitacao = buscarSolicitacao(solicitacaoId);
 
         var usuarioLogado = buscarUsuarioLogado();
+
+        if (usuarioLogado.getPerfil() == Perfil.CIDADAO) {
+            if (!solicitacao.getCidadao().getId().equals(usuarioLogado.getId())) {
+                throw new AccessDeniedException("Não tem permissão para adicionar acompanhamentos a uma solicitação de outro cidadão.");
+            }
+        }
 
         solicitacao.adicionarAcompanhamento(dados.descricao(), usuarioLogado);
 

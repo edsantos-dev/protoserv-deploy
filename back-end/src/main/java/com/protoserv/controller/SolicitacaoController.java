@@ -65,7 +65,7 @@ public class SolicitacaoController {
     }
 
     @PostMapping("/{id}/acompanhamentos")
-    @PreAuthorize("hasAnyAuthority('ATENDENTE')") 
+    @PreAuthorize("hasAnyAuthority('ATENDENTE', 'CIDADAO')") 
     public ResponseEntity<DadosSolicitacaoDTO> adicionarAcompanhamento(
             @PathVariable Long id,
             @RequestBody @Valid DadosNovoAcompanhamentoDTO dados) {
