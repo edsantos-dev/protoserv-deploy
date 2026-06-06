@@ -83,7 +83,11 @@ public class Solicitacao {
     }
 
 
-    public void atualizarStatus(StatusSolicitacao novoStatus) {
+    public void atualizarStatus(StatusSolicitacao novoStatus, Usuario executor) {
+        if (executor.getPerfil() == Perfil.CIDADAO) {
+            throw new SecurityException("Cidadãos não têm permissão para alterar o status da solicitação.");
+        }
+        
         if (novoStatus == null) {
             throw new IllegalArgumentException("O novo status não pode ser nulo.");
         }

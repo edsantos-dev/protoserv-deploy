@@ -121,7 +121,7 @@ public class SolicitacaoService {
         solicitacao.adicionarAcompanhamento(dados.descricao(), usuarioLogado);
 
         if (dados.novoStatus() != null && dados.novoStatus() != solicitacao.getStatus()) {
-            solicitacao.atualizarStatus(dados.novoStatus());
+            solicitacao.atualizarStatus(dados.novoStatus(), usuarioLogado);
         }
 
         return new DadosSolicitacaoDTO(solicitacao);
