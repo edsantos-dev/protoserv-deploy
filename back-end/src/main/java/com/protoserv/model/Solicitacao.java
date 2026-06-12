@@ -115,4 +115,13 @@ public class Solicitacao {
             this.dataConclusao = LocalDateTime.now();
         }
     }
+
+    public void reclassificar(Servico novoServico, PrioridadeSolicitacao novaPrioridade) {
+        if (novoServico != null) {
+            this.servico = novoServico;
+        }
+        if (novaPrioridade != null) {
+            this.prioridade = novaPrioridade;
+        }
+    }
 }
