@@ -2,6 +2,7 @@ package com.protoserv.service;
 
 import com.protoserv.dto.request.DadosAberturaSolicitacaoDTO;
 import com.protoserv.dto.request.DadosNovoAcompanhamentoDTO;
+import com.protoserv.dto.request.DadosReclassificacaoSolicitacaoDTO;
 import com.protoserv.dto.response.DadosListagemSolicitacaoDTO;
 import com.protoserv.dto.response.DadosSolicitacaoDTO;
 import com.protoserv.model.Endereco;
@@ -166,6 +167,32 @@ public class SolicitacaoService {
             if (!solicitacao.getCidadao().getId().equals(usuarioLogado.getId())) {
                 throw new AccessDeniedException("Você não tem permissão para visualizar os detalhes de uma solicitação de outro cidadão.");
             }
+        }
+
+        return new DadosSolicitacaoDTO(solicitacao);
+    }
+
+    @Transactional
+    public DadosSolicitacaoDTO reclassificar(Long id, DadosReclassificacaoSolicitacaoDTO dados) {
+        var solicitacao = buscarSolicitacao(id);
+
+        StringBuilder mudancas = new StringBuilder("SISTEMA: Reclassificação do chamado. ");
+
+        if (dados.servicoId() != null && !dados.servicoId().equals(solicitacao.getServico().getId())) {
+            var novoServico = servicoRepository.findById(dados.servicoId())
+                    .orElseThrow(() -> new EntityNotFoundException("Serviço não encontrado."));
+            
+            mudancas.append(String.format("Serviço alterado de '%s' para '%s'. ", solicitacao.getServico().getNome(), novoServico.getNome()));
+            solicitacao.reclassificar(novoServico, null);
+        }
+
+        if (dados.prioridade() != null && !dados.prioridade().equals(solicitacao.getPrioridade())) {
+            mudancas.append(String.format("Prioridade alterada para %s. ", dados.prioridade()));
+            solicitacao.reclassificar(null, dados.prioridade());
+        }
+
+        if (!mudancas.toString().equals("SISTEMA: Reclassificação do chamado. ")) {
+            solicitacao.adicionarAcompanhamentoSistema(mudancas.toString());
         }
 
         return new DadosSolicitacaoDTO(solicitacao);
