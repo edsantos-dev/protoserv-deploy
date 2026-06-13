@@ -144,9 +144,9 @@ public class Solicitacao {
             throw new IllegalStateException("O prazo de 3 dias para reabertura desta solicitação já expirou.");
         }
         
-        this.atualizarStatus(StatusSolicitacao.EM_ANDAMENTO, null);
+        this.status = StatusSolicitacao.EM_ANDAMENTO;
         this.dataConclusao = null; 
         
-        this.adicionarAcompanhamentoSistema("Solicitação reaberta pelo cidadão (Contestação).");
+        this.adicionarAcompanhamentoSistema("SISTEMA: Solicitação reaberta pelo cidadão (Contestação).");
     }
 }
