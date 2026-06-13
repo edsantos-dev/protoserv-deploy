@@ -109,7 +109,7 @@ public class SolicitacaoController {
             @RequestBody DadosReclassificacaoSolicitacaoDTO dados) {
         
         var solicitacaoAtualizada = solicitacaoService.reclassificar(id, dados);
-        
+
         return ResponseEntity.ok(solicitacaoAtualizada);
     }
 
@@ -120,5 +120,14 @@ public class SolicitacaoController {
         var solicitacaoCancelada = solicitacaoService.cancelarSolicitacao(id);
         
         return ResponseEntity.ok(solicitacaoCancelada);
+    }
+
+    @PatchMapping("/{id}/reabrir")
+    @PreAuthorize("hasAuthority('CIDADAO')")
+    public ResponseEntity<DadosSolicitacaoDTO> reabrir(@PathVariable Long id) {
+        
+        var solicitacaoReaberta = solicitacaoService.reabrirSolicitacao(id);
+        
+        return ResponseEntity.ok(solicitacaoReaberta);
     }
 }
