@@ -124,4 +124,14 @@ public class Solicitacao {
             this.prioridade = novaPrioridade;
         }
     }
+
+    public void cancelar() {
+        if (this.status != StatusSolicitacao.NOVO) {
+            throw new IllegalStateException("Apenas solicitações com status NOVO podem ser canceladas.");
+        }
+        
+        this.status = StatusSolicitacao.CANCELADA;
+        
+        this.adicionarAcompanhamentoSistema("SISTEMA: Solicitação cancelada pelo cidadão.");
+    }
 }
