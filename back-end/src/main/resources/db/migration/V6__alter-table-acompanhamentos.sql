@@ -1,0 +1,1 @@
+ALTER TABLE acompanhamentos MODIFY COLUMN usuario_id BIGINT NULL;
