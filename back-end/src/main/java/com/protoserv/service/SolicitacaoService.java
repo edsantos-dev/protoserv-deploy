@@ -137,11 +137,7 @@ public class SolicitacaoService {
 
         var usuarioLogado = buscarUsuarioLogado();
 
-        if (usuarioLogado.getPerfil() == Perfil.CIDADAO) {
-            if (!solicitacao.getCidadao().getId().equals(usuarioLogado.getId())) {
-                throw new AccessDeniedException("Não tem permissão para adicionar acompanhamentos a uma solicitação de outro cidadão.");
-            }
-        }
+        validarPropriedadeDoCidadao(solicitacao, usuarioLogado, "adicionar acompanhamento a");
 
         solicitacao.adicionarAcompanhamento(dados.descricao(), usuarioLogado, dados.anexoUrl());
 
@@ -163,11 +159,7 @@ public class SolicitacaoService {
 
         var usuarioLogado = buscarUsuarioLogado();
 
-        if (usuarioLogado.getPerfil() == Perfil.CIDADAO) {
-            if (!solicitacao.getCidadao().getId().equals(usuarioLogado.getId())) {
-                throw new AccessDeniedException("Você não tem permissão para visualizar os detalhes de uma solicitação de outro cidadão.");
-            }
-        }
+        validarPropriedadeDoCidadao(solicitacao, usuarioLogado, "visualizar os detalhes de");
 
         return new DadosSolicitacaoDTO(solicitacao);
     }
@@ -203,11 +195,7 @@ public class SolicitacaoService {
 
         var usuarioLogado = buscarUsuarioLogado();
 
-        if (usuarioLogado.getPerfil() == Perfil.CIDADAO) {
-            if (!solicitacao.getCidadao().getId().equals(usuarioLogado.getId())) {
-                throw new AccessDeniedException("Você não tem permissão para cancelar uma solicitação de outro cidadão.");
-            }
-        }
+        validarPropriedadeDoCidadao(solicitacao, usuarioLogado, "cancelar");
 
         solicitacao.cancelar();
 
@@ -220,15 +208,19 @@ public class SolicitacaoService {
 
         var usuarioLogado = buscarUsuarioLogado();
 
-        if (usuarioLogado.getPerfil() == Perfil.CIDADAO) {
-            if (!solicitacao.getCidadao().getId().equals(usuarioLogado.getId())) {
-                throw new AccessDeniedException("Você não tem permissão para reabrir uma solicitação de outro cidadão.");
-            }
-        }
+        validarPropriedadeDoCidadao(solicitacao, usuarioLogado, "reabrir");
 
         solicitacao.reabrir();
 
         return new DadosSolicitacaoDTO(solicitacao);
+    }
+
+    private void validarPropriedadeDoCidadao(Solicitacao solicitacao, Usuario usuarioLogado, String acao) {
+        if (usuarioLogado.getPerfil() == Perfil.CIDADAO) {
+            if (!solicitacao.getCidadao().getId().equals(usuarioLogado.getId())) {
+                throw new AccessDeniedException("Você não tem permissão para " + acao + " uma solicitação de outro cidadão.");
+            }
+        }
     }
 
     private String gerarProtocoloUnico() {
