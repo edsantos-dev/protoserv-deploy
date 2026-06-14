@@ -10,7 +10,8 @@ public record DadosListagemSolicitacaoDTO(
         String cidadaoNome,
         String status,
         String prioridade,
-        LocalDateTime dataAbertura
+        LocalDateTime dataAbertura,
+        LocalDateTime dataConclusao
 ) {
     public DadosListagemSolicitacaoDTO(Solicitacao solicitacao) {
         this(
@@ -20,7 +21,8 @@ public record DadosListagemSolicitacaoDTO(
                 solicitacao.getCidadao().getNome(),
                 solicitacao.getStatus().name(),
                 solicitacao.getPrioridade().name(),
-                solicitacao.getDataAbertura()
+                solicitacao.getDataAbertura(),
+                solicitacao.getDataConclusao()
         );
     }
 }
