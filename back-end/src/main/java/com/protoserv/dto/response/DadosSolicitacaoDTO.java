@@ -22,6 +22,7 @@ public record DadosSolicitacaoDTO(
         String anexoUrl,
         LocalDateTime dataAbertura,
         LocalDateTime dataConclusao,
+        String atendenteNome,
         List<DadosAcompanhamentoDTO> historico
 ) {
     public DadosSolicitacaoDTO(Solicitacao solicitacao) {
@@ -43,6 +44,7 @@ public record DadosSolicitacaoDTO(
             solicitacao.getAnexoUrl(),
             solicitacao.getDataAbertura(),
             solicitacao.getDataConclusao(),
+            solicitacao.getAtendente() != null ? solicitacao.getAtendente().getNome() : null,
             solicitacao.getAcompanhamentos() != null ? solicitacao.getAcompanhamentos().stream().map(DadosAcompanhamentoDTO::new).toList() : List.of()
         );
     }
