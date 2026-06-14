@@ -1,6 +1,9 @@
 package com.protoserv.controller;
 
-import com.protoserv.dto.request.*;
+import com.protoserv.dto.request.DadosAlterarSenhaDTO;
+import com.protoserv.dto.request.DadosCriarUsuarioDTO;
+import com.protoserv.dto.request.DadosEdicaoUsuarioAdminDTO;
+import com.protoserv.dto.request.DadosEdicaoUsuarioDTO;
 import com.protoserv.dto.response.DadosListagemUsuarioDTO;
 import com.protoserv.dto.response.DadosPerfilDTO;
 import com.protoserv.model.StatusUsuario;
@@ -15,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -34,13 +36,11 @@ public class UsuarioController {
     public ResponseEntity<DadosPerfilDTO> criarUsuario(
             @RequestBody @Valid DadosCriarUsuarioDTO dto,
             UriComponentsBuilder uriBuilder) {
-
+        
         DadosPerfilDTO novoUsuario = usuarioService.criarUsuario(dto);
-
-        var uri = uriBuilder.path("/usuarios/{id}")
-                .buildAndExpand(novoUsuario.id())
-                .toUri();
-
+        
+        var uri = uriBuilder.path("/usuarios/{id}").buildAndExpand(novoUsuario.id()).toUri();
+        
         return ResponseEntity.created(uri).body(novoUsuario);
     }
 
@@ -49,10 +49,8 @@ public class UsuarioController {
     public ResponseEntity<Page<DadosListagemUsuarioDTO>> listar(
             @RequestParam(required = false) StatusUsuario status,
             @PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao) {
-
-        Page<DadosListagemUsuarioDTO> page =
-                usuarioService.listarUsuario(status, paginacao);
-
+        
+        Page<DadosListagemUsuarioDTO> page = usuarioService.listarUsuario(status, paginacao);
         return ResponseEntity.ok(page);
     }
 
@@ -60,6 +58,7 @@ public class UsuarioController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> inativar(@PathVariable Long id) {
         usuarioService.inativarUsuario(id);
+        
         return ResponseEntity.noContent().build();
     }
 
@@ -67,33 +66,13 @@ public class UsuarioController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> ativar(@PathVariable Long id) {
         usuarioService.ativarUsuario(id);
+        
         return ResponseEntity.noContent().build();
     }
 
-    // =========================================
-    // 🔥 ENDPOINT /ME (CORRIGIDO E SEGURO)
-    // =========================================
     @GetMapping("/me")
-    public ResponseEntity<DadosPerfilDTO> meuPerfil(
-            @AuthenticationPrincipal UserDetails userDetails) {
-
-        String email;
-
-        if (userDetails != null) {
-            email = userDetails.getUsername();
-        } else {
-            var auth = SecurityContextHolder.getContext().getAuthentication();
-
-            if (auth == null || auth.getName() == null) {
-                return ResponseEntity.status(401).build();
-            }
-
-            email = auth.getName();
-        }
-
-        DadosPerfilDTO perfil =
-                usuarioService.obterPerfilLogado(email);
-
+    public ResponseEntity<DadosPerfilDTO> meuPerfil(@AuthenticationPrincipal UserDetails userDetails) {
+        DadosPerfilDTO perfil = usuarioService.obterPerfilLogado(userDetails.getUsername());
         return ResponseEntity.ok(perfil);
     }
 
@@ -101,7 +80,7 @@ public class UsuarioController {
     public ResponseEntity<Void> alterarMinhaSenha(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody @Valid DadosAlterarSenhaDTO dto) {
-
+        
         usuarioService.alterarSenha(userDetails.getUsername(), dto);
         return ResponseEntity.noContent().build();
     }
@@ -110,13 +89,9 @@ public class UsuarioController {
     public ResponseEntity<DadosPerfilDTO> atualizarMeuPerfil(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody @Valid DadosEdicaoUsuarioDTO dto) {
-
-        DadosPerfilDTO perfilAtualizado =
-                usuarioService.atualizarDadosUsuario(
-                        userDetails.getUsername(),
-                        dto
-                );
-
+        
+        DadosPerfilDTO perfilAtualizado = usuarioService.atualizarDadosUsuario(userDetails.getUsername(), dto);
+        
         return ResponseEntity.ok(perfilAtualizado);
     }
 
@@ -125,10 +100,9 @@ public class UsuarioController {
     public ResponseEntity<DadosPerfilDTO> atualizarUsuario(
             @PathVariable Long id,
             @RequestBody @Valid DadosEdicaoUsuarioAdminDTO dto) {
-
-        DadosPerfilDTO usuarioAtualizado =
-                usuarioService.atualizarUsuarioPeloAdmin(id, dto);
-
+        
+        DadosPerfilDTO usuarioAtualizado = usuarioService.atualizarUsuarioPeloAdmin(id, dto);
+        
         return ResponseEntity.ok(usuarioAtualizado);
     }
 }
