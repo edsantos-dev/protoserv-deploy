@@ -55,7 +55,8 @@ function getPerfil(): string {
     const token = localStorage.getItem("token");
     if (!token) return "";
     const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload.perfil ?? "";
+    const perfil = payload.perfil ?? payload.role ?? payload.authorities ?? "";
+    return String(perfil).toUpperCase().replace("ROLE_", "");
   } catch {
     return "";
   }
@@ -108,7 +109,6 @@ function formatDate(iso: string) {
   });
 }
 
-// Separação por perfil, não por nome — muito mais confiável
 function MensagemBubble({ msg, perfil }: { msg: Acompanhamento; perfil: string }) {
   const isSistema = msg.autorPerfil === "SISTEMA";
 
@@ -181,6 +181,7 @@ export default function Protocolos() {
 
   useEffect(() => {
     const p = getPerfil();
+    console.log("Perfil detectado:", p);
     setPerfil(p);
     carregarProtocolos(p);
   }, []);
@@ -277,6 +278,7 @@ export default function Protocolos() {
     } catch {}
   }
 
+  // Envia mensagem (status é opcional junto)
   async function enviarMensagem() {
     if (!mensagem.trim() || !solicitacao) return;
 
@@ -289,9 +291,7 @@ export default function Protocolos() {
         anexoUrl: "",
       };
 
-      if (novoStatus) {
-        body.novoStatus = novoStatus;
-      }
+      if (novoStatus) body.novoStatus = novoStatus;
 
       const res = await fetch(
         `http://localhost:8080/solicitacoes/${solicitacao.id}/acompanhamentos`,
@@ -301,13 +301,58 @@ export default function Protocolos() {
           body: JSON.stringify(body),
         }
       );
-      if (!res.ok) throw new Error();
+
+      if (!res.ok) {
+        const err = await res.text();
+        console.error("Erro backend:", err);
+        throw new Error(err);
+      }
+
       setMensagem("");
       setNovoStatus("");
       await recarregarChat();
       carregarProtocolos();
-    } catch {
-      alert("Erro ao enviar mensagem.");
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao enviar mensagem. Veja o console para detalhes.");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  // Atualiza só o status, sem precisar digitar mensagem
+  async function atualizarSomenteStatus() {
+    if (!novoStatus || !solicitacao) return;
+
+    setEnviando(true);
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        `http://localhost:8080/solicitacoes/${solicitacao.id}/acompanhamentos`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            descricao: `Status alterado para: ${getStatusLabel(novoStatus)}`,
+            novoStatus,
+            anexoUrl: "",
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.text();
+        console.error("Erro backend:", err);
+        throw new Error(err);
+      }
+
+      setNovoStatus("");
+      await recarregarChat();
+      carregarProtocolos();
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao atualizar status. Veja o console para detalhes.");
     } finally {
       setEnviando(false);
     }
@@ -421,7 +466,7 @@ export default function Protocolos() {
         </div>
 
         {painelAberto && (
-          <aside className="w-[420px] shrink-0 bg-white border-l border-gray-200 flex flex-col overflow-hidden">
+          <aside className="relative z-20 w-[420px] shrink-0 bg-white border-l border-gray-200 flex flex-col overflow-hidden">
 
             <div className="px-5 py-4 border-b border-gray-200 flex items-start justify-between shrink-0">
               <div className="flex-1 min-w-0 pr-3">
@@ -498,24 +543,36 @@ export default function Protocolos() {
 
             {!loadingChat && !erroChat && solicitacao && !isStatusFinal(solicitacao.status) && (
               <div className="border-t border-gray-200 px-5 py-4 shrink-0">
+
+                {/* Bloco de status — separado do chat, só atendente/admin */}
                 {isAtendente && (
-                  <div className="mb-3">
+                  <div className="mb-4 pb-4 border-b border-gray-100">
                     <label className="text-xs font-semibold text-gray-600 mb-1 block">
-                      Alterar status <span className="text-gray-400 font-normal">(opcional)</span>
+                      Alterar status <span className="text-gray-400 font-normal">(sem precisar enviar mensagem)</span>
                     </label>
-                    <select
-                      value={novoStatus}
-                      onChange={(e) => setNovoStatus(e.target.value)}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
-                    >
-                      <option value="">Manter status atual</option>
-                      {STATUS_OPTIONS.map((s) => (
-                        <option key={s.value} value={s.value}>{s.label}</option>
-                      ))}
-                    </select>
+                    <div className="flex gap-2">
+                      <select
+                        value={novoStatus}
+                        onChange={(e) => setNovoStatus(e.target.value)}
+                        className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                      >
+                        <option value="">Selecione o novo status...</option>
+                        {STATUS_OPTIONS.map((s) => (
+                          <option key={s.value} value={s.value}>{s.label}</option>
+                        ))}
+                      </select>
+                      <button
+                        onClick={atualizarSomenteStatus}
+                        disabled={!novoStatus || enviando}
+                        className="bg-gray-800 hover:bg-gray-900 disabled:opacity-40 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-xs font-semibold transition shrink-0"
+                      >
+                        Salvar
+                      </button>
+                    </div>
                   </div>
                 )}
 
+                {/* Chat input — todos podem enviar mensagem */}
                 <div className="flex gap-2 items-end">
                   <textarea
                     value={mensagem}
