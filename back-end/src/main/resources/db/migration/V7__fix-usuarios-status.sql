@@ -1,0 +1,1 @@
+UPDATE usuarios SET status = 'ATIVO' WHERE status IS NULL OR status = '';
