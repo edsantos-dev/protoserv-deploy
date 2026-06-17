@@ -10,6 +10,7 @@ export default function Perfil() {
   const [editando, setEditando] = useState(false);
   const [trocandoSenha, setTrocandoSenha] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [carregando, setCarregando] = useState(true);
 
   const [usuario, setUsuario] = useState({ nome: "", email: "" });
   const [backup, setBackup] = useState({ nome: "", email: "" });
@@ -41,6 +42,8 @@ export default function Perfil() {
         setBackup({ nome: data.nome, email: data.email });
       } catch {
         router.push("/login");
+      } finally {
+        setCarregando(false);
       }
     }
 
@@ -137,22 +140,33 @@ export default function Perfil() {
 
   const inicial = usuario.nome ? usuario.nome.charAt(0).toUpperCase() : "U";
 
+  if (carregando) {
+    return (
+      <main className="flex h-screen bg-gray-900">
+        <Sidebar />
+        <div className="flex-1 bg-gray-100 flex justify-center items-center">
+          <p className="text-gray-400 text-sm">Carregando perfil...</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="flex h-screen bg-gray-900">
       <Sidebar />
 
-{/* TOAST */}
-{toast && (
-  <div
-    className={`fixed top-6 right-6 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
-      toast.tipo === "sucesso"
-        ? "bg-green-100 text-green-800 border border-green-300"
-        : "bg-red-100 text-red-800 border border-red-300"
-    }`}
-  >
-    {toast.mensagem}
-  </div>
-)}
+      {/* TOAST */}
+      {toast && (
+        <div
+          className={`fixed top-6 right-6 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
+            toast.tipo === "sucesso"
+              ? "bg-green-100 text-green-800 border border-green-300"
+              : "bg-red-100 text-red-800 border border-red-300"
+          }`}
+        >
+          {toast.mensagem}
+        </div>
+      )}
 
       <div className="flex-1 bg-gray-100 flex justify-center items-start p-8 overflow-y-auto">
         <div className="w-full max-w-2xl space-y-6">
@@ -171,25 +185,25 @@ export default function Perfil() {
               </div>
             </div>
 
-<div className="space-y-4">
-  <div>
-    <label className="block text-sm font-medium text-gray-600 mb-1">Nome</label>
-    <input
-      name="nome"
-      value={usuario.nome}
-      onChange={handleChange}
-      disabled={!editando}
-      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 bg-gray-50 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-  </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Nome</label>
+                <input
+                  name="nome"
+                  value={usuario.nome}
+                  onChange={handleChange}
+                  disabled={!editando}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 bg-gray-50 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
 
-  <div>
-    <label className="block text-sm font-medium text-gray-600 mb-1">E-mail</label>
-<p className="text-sm text-gray-800 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
-  {usuario.email}
-</p>
-  </div>
-</div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">E-mail</label>
+                <p className="text-sm text-gray-800 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
+                  {usuario.email}
+                </p>
+              </div>
+            </div>
 
             <div className="flex justify-end gap-3 mt-6">
               {editando && (
