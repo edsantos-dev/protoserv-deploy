@@ -109,7 +109,7 @@ protoserv/
 
 ---
 
-## 6.Funcionalidades Implementadas
+## 6.Funcionalidades Implementadas 
 
 ### Autenticação e Perfis
 * Login com e-mail e senha via API REST (`/autenticacao/login`)
