@@ -9,15 +9,19 @@ type Servico = {
   descricao: string;
   icone?: string;
   ativo?: boolean;
+  prazoDias: number;
+  categoria: string;
 };
 
 type FormData = {
   nome: string;
   descricao: string;
   icone: string;
+  prazoDias: number | "";
+  categoria: string;
 };
 
-const FORM_VAZIO: FormData = { nome: "", descricao: "", icone: "" };
+const FORM_VAZIO: FormData = { nome: "", descricao: "", icone: "", prazoDias: "", categoria: "" };
 
 export default function AdminServicos() {
   const [servicos, setServicos] = useState<Servico[]>([]);
@@ -87,6 +91,8 @@ export default function AdminServicos() {
       nome: servicoSelecionado.nome,
       descricao: servicoSelecionado.descricao,
       icone: servicoSelecionado.icone ?? "",
+      prazoDias: servicoSelecionado.prazoDias,
+      categoria: servicoSelecionado.categoria,
     });
     setErroForm("");
     setModoForm("editar");
@@ -104,6 +110,14 @@ export default function AdminServicos() {
       setErroForm("Nome e descrição são obrigatórios.");
       return;
     }
+    if (!form.categoria.trim()) {
+      setErroForm("A categoria é obrigatória.");
+      return;
+    }
+    if (form.prazoDias === "" || Number(form.prazoDias) <= 0) {
+      setErroForm("O prazo em dias é obrigatório e deve ser maior que zero.");
+      return;
+    }
     setSalvando(true);
     try {
       const token = localStorage.getItem("token");
@@ -115,7 +129,10 @@ export default function AdminServicos() {
       const res = await fetch(url, {
         method: isEditar ? "PUT" : "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          prazoDias: Number(form.prazoDias),
+        }),
       });
 
       if (!res.ok) throw new Error(await res.text());
@@ -196,6 +213,7 @@ export default function AdminServicos() {
                       <div>
                         <p className="font-bold text-gray-900">{s.nome}</p>
                         <p className="text-sm text-gray-500">{s.descricao}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{s.categoria} · {s.prazoDias} dia{s.prazoDias !== 1 ? "s" : ""}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -250,6 +268,14 @@ export default function AdminServicos() {
                     <p className="text-gray-700 text-sm leading-relaxed">{servicoSelecionado.descricao}</p>
                   </div>
                   <div>
+                    <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Categoria</p>
+                    <p className="text-gray-700 text-sm">{servicoSelecionado.categoria}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Prazo</p>
+                    <p className="text-gray-700 text-sm">{servicoSelecionado.prazoDias} dia{servicoSelecionado.prazoDias !== 1 ? "s" : ""}</p>
+                  </div>
+                  <div>
                     <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Status</p>
                     <span className={`text-xs px-3 py-1 rounded-full font-semibold ${
                       servicoSelecionado.ativo === false ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
@@ -299,6 +325,26 @@ export default function AdminServicos() {
                       rows={3}
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                       placeholder="Descrição do serviço"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600 mb-1 block">Categoria *</label>
+                    <input
+                      value={form.categoria}
+                      onChange={(e) => setForm((f) => ({ ...f, categoria: e.target.value }))}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Ex: Saúde, Educação, Transporte..."
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600 mb-1 block">Prazo (dias) *</label>
+                    <input
+                      type="number"
+                      min={1}
+                      value={form.prazoDias}
+                      onChange={(e) => setForm((f) => ({ ...f, prazoDias: e.target.value === "" ? "" : Number(e.target.value) }))}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Ex: 5"
                     />
                   </div>
                   <div>
