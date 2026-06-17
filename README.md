@@ -2,7 +2,7 @@
 
 ### Disciplina: IMERSÃO PROFISSIONAL: FÁBRICA DE SOFTWARE
 
-O **PROTOSERV** é um sistema desenvolvido como parte da disciplina de Fábrica de Software, focado na gestão e prestação de serviços. O projeto utiliza uma arquitetura moderna com Next.js no frontend e containerização com Docker para garantir a consistência do ambiente de desenvolvimento.
+O **PROTOSERV** é um sistema desenvolvido como parte da disciplina de Fábrica de Software, focado na gestão e prestação de serviços públicos municipais. Permite que cidadãos abram solicitações, acompanhem protocolos em tempo real e se comuniquem com atendentes. A plataforma possui perfis diferenciados para Cidadãos, Atendentes e Administradores. O projeto utiliza uma arquitetura moderna com Next.js no frontend e containerização com Docker para garantir a consistência do ambiente de desenvolvimento.
 
 ---
 
@@ -37,8 +37,10 @@ O projeto utiliza o seguinte conjunto de tecnologias principais:
 * **Biblioteca UI**: React 19.2.3
 * **Estilização**: Tailwind CSS ^4
 * **Linguagem**: TypeScript ^5
+* **Notificações**: react-hot-toast
 * **Containerização**: Docker e Docker Compose
 * **Banco de Dados**: MySQL 8.0
+* **Autenticação**: JWT (JSON Web Token)
 
 ---
 
@@ -59,16 +61,137 @@ docker-compose up --build
 
 ### Este comando irá:
 
-Construir a imagem da aplicação baseada no arquivo front-end/my-app/package.json.
+* Construir a imagem da aplicação baseada no arquivo `front-end/my-app/package.json`.
+* Iniciar o container do banco de dados MySQL (`protoserv-db`) na porta `3306`.
+* Disponibilizar o sistema no endereço: [http://localhost:3000](http://localhost:3000).
 
-Iniciar o container do banco de dados MySQL.
+### Variáveis de ambiente (configuradas no `docker-compose.yml`)
 
-Disponibilizar o sistema no endereço: http://localhost:3000.
+```env
+MYSQL_DATABASE=protoserv_db
+MYSQL_ROOT_PASSWORD=root
+MYSQL_USER=admin
+MYSQL_PASSWORD=protoserv
+DATABASE_URL=mysql://user_protoserv:password_aqui@db:3306/protoserv_db
+```
 
-### 📁 5. Estrutura de Pastas (Frontend)
+---
 
-/front-end/my-app/app: Contém as rotas e páginas principais (Login, Register, Serviços).
+## 📁 5. Estrutura de Pastas (Frontend)
 
-/front-end/my-app/components: Componentes reutilizáveis (Sidebar, Button, Input, Logo).
+```text
+protoserv/
+├── docker-compose.yml
+└── front-end/
+    └── my-app/
+        ├── app/
+        │   ├── page.tsx              # Painel principal (home)
+        │   ├── layout.tsx            # Layout global + Toaster de notificações
+        │   ├── login/                # Tela de login com autenticação JWT
+        │   ├── register/             # Tela de cadastro de novos usuários
+        │   ├── perfil/               # Edição de dados pessoais e troca de senha
+        │   ├── servicos/             # Seleção e abertura de solicitações de serviço
+        │   ├── protocolos/           # Acompanhamento de protocolos e chat
+        │   └── admin/
+        │       ├── servicos/         # CRUD de serviços (somente Admin)
+        │       └── usuarios/         # CRUD de usuários (somente Admin)
+        │
+        ├── components/
+        │   ├── Sidebar.tsx           # Menu lateral com navegação por perfil
+        │   ├── Footer.tsx            # Rodapé
+        │   ├── bot.tsx               # Widget de suporte/chatbot
+        │   ├── Button.tsx            # Componente de botão reutilizável
+        │   ├── Input.tsx             # Componente de input reutilizável
+        │   └── Logo.tsx              # Logo do sistema
+        │
+        └── public/                   # Ativos estáticos como logos e imagens
+```
 
-/front-end/my-app/public: Ativos estáticos como logos e imagens.
+---
+
+## ✨ 6. Funcionalidades Implementadas
+
+### 🔐 Autenticação e Perfis
+* Login com e-mail e senha via API REST (`/autenticacao/login`)
+* Token JWT armazenado no `localStorage` e enviado em todas as requisições
+* Três perfis de acesso com menus e permissões distintas: **Cidadão**, **Atendente** e **Administrador**
+* Redirecionamento automático para login quando o token é inválido ou ausente
+
+### 🏠 Painel Principal
+* Dashboard com 3 ações rápidas: **Solicitar Serviço**, **Acompanhar Protocolo** e **Suporte**
+* Widget de chatbot de suporte integrado diretamente na home
+
+### ⚙️ Solicitação de Serviços (`/servicos`)
+* Listagem de serviços disponíveis com ícones (Iluminação Pública, Coleta de Lixo, Infraestrutura, Limpeza Urbana, Vazamento de Água, Outros)
+* Busca e filtro de serviços em tempo real
+* Formulário completo com: descrição, endereço completo (CEP, logradouro, número, bairro, cidade, estado, complemento) e link de anexo opcional
+* Fallback automático com serviços fixos caso o backend esteja indisponível
+* Redirecionamento automático para protocolos após abertura bem-sucedida
+
+### 📋 Acompanhamento de Protocolos (`/protocolos`)
+* Visão diferenciada por perfil:
+  * **Cidadão**: visualiza apenas suas próprias solicitações
+  * **Atendente / Admin**: visualiza todas as solicitações com informações de solicitante
+* Badges coloridos de status: `NOVO`, `EM_ANDAMENTO`, `PENDENTE`, `CONCLUIDA`, `CANCELADA`
+* Indicação de prioridade: `ALTA`, `MÉDIA`, `BAIXA`
+* Atendentes podem **assumir** solicitações não atribuídas diretamente pela lista
+* Cidadão pode **cancelar** solicitações em aberto
+* Cidadão pode **reabrir** solicitações canceladas (com modal de confirmação)
+
+### 💬 Chat por Protocolo (painel lateral)
+* Painel lateral deslizante com histórico completo de mensagens
+* Conversa em tempo real entre cidadão e atendente com bolhas de chat diferenciadas
+* Mensagens automáticas do sistema ao mudar status (ex: "Status alterado para: Em andamento")
+* Atendente pode alterar o status sem precisar enviar mensagem
+* Scroll automático para a última mensagem
+* Exibição de dados completos da solicitação (endereço, descrição, prioridade, atendente)
+
+### 👤 Perfil do Usuário (`/perfil`)
+* Visualização e edição de nome e e-mail
+* Troca de senha com validação de senha atual
+
+### 🛠️ Painel Administrativo (`/admin`) — somente Admin
+* **Gerenciar Serviços** (`/admin/servicos`):
+  * Listagem com nome, descrição, categoria, prazo e status (ativo/inativo)
+  * Criar novo serviço com emoji, categoria e prazo em dias
+  * Editar serviço existente via painel lateral
+  * Ativar e desativar serviços
+* **Gerenciar Usuários** (`/admin/usuarios`):
+  * Listagem de todos os usuários com perfil e status
+  * Criar novos usuários com definição de perfil (Cidadão, Atendente, Admin)
+  * Editar dados e ativar/desativar usuários
+
+### 🤖 Chatbot de Suporte
+* Bot embutido na home com respostas automáticas a perguntas frequentes
+* Sugestões rápidas de ações clicáveis (abrir protocolo, acompanhar, ajuda)
+* Reconhece saudações, dúvidas sobre serviços, protocolos, login e navegação
+
+### 🧭 Sidebar Inteligente
+* Navegação adaptada automaticamente ao perfil do usuário logado
+* Exibe nome, perfil e inicial do usuário logado
+* Botão de logout integrado
+
+---
+
+## 🔌 7. API Backend
+
+O frontend consome uma API REST rodando em `http://localhost:8080`. Principais endpoints utilizados:
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/autenticacao/login` | Autenticação e geração de token JWT |
+| GET | `/usuarios/me` | Dados do usuário logado |
+| GET | `/usuarios` | Lista todos os usuários (Admin) |
+| GET | `/servicos` | Lista os serviços disponíveis |
+| POST | `/servicos` | Cria novo serviço (Admin) |
+| PUT | `/servicos/:id` | Edita serviço (Admin) |
+| PATCH | `/servicos/:id/ativar` | Ativa serviço (Admin) |
+| PATCH | `/servicos/:id/desativar` | Desativa serviço (Admin) |
+| POST | `/solicitacoes` | Abre uma nova solicitação |
+| GET | `/solicitacoes` | Lista todas as solicitações (Atendente/Admin) |
+| GET | `/solicitacoes/minhas` | Lista solicitações do cidadão logado |
+| GET | `/solicitacoes/:id` | Detalhe completo de uma solicitação |
+| PATCH | `/solicitacoes/:id/assumir` | Atendente assume a solicitação |
+| PATCH | `/solicitacoes/:id/cancelar` | Cancela a solicitação |
+| PATCH | `/solicitacoes/:id/reabrir` | Reabre solicitação cancelada |
+| POST | `/solicitacoes/:id/acompanhamentos` | Envia mensagem ou atualiza status |
