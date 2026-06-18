@@ -96,6 +96,14 @@ public class SolicitacaoService {
 
         solicitacaoRepository.save(solicitacao);
 
+        var evento = new DadosNotificacaoPadraoDTO(
+                cidadao.getEmail(),
+                "Solicitação Aberta - Protocolo " + protocolo,
+                "Olá " + cidadao.getNome() + ", sua solicitação para o serviço '" + servico.getNome() + "' foi recebida com sucesso. O protocolo para acompanhamento é: " + protocolo + "."
+        );
+
+        publisher.publishEvent(evento);
+
         return new DadosSolicitacaoDTO(solicitacao);
     }
 
@@ -134,6 +142,15 @@ public class SolicitacaoService {
 
         solicitacao.assumir(atendenteLogado);
 
+        var evento = new DadosNotificacaoPadraoDTO(
+                solicitacao.getCidadao().getEmail(),
+                "Solicitação em Andamento - Protocolo " + solicitacao.getProtocolo(),
+                "Olá " + solicitacao.getCidadao().getNome() + ", boas notícias! Sua solicitação de protocolo " 
+                + solicitacao.getProtocolo() + " acabou de ser assumida por nossa equipe e já está em andamento. O atendente responsável é " + atendenteLogado.getNome() + ". Agradecemos pela paciência e estamos trabalhando para resolver sua solicitação o mais rápido possível."
+        );
+
+        publisher.publishEvent(evento);
+
         return new DadosSolicitacaoDTO(solicitacao);
     }
 
@@ -150,6 +167,15 @@ public class SolicitacaoService {
         if (dados.novoStatus() != null && dados.novoStatus() != solicitacao.getStatus()) {
             solicitacao.atualizarStatus(dados.novoStatus(), usuarioLogado); 
         }
+
+        var evento = new DadosNotificacaoPadraoDTO(
+                solicitacao.getCidadao().getEmail(),
+                "Nova Movimentação - Protocolo " + solicitacao.getProtocolo(),
+                "Olá " + solicitacao.getCidadao().getNome() + ", houve uma nova movimentação ou comentário na sua solicitação de protocolo " 
+                + solicitacao.getProtocolo() + ". Acesse o sistema para conferir os detalhes."
+        );
+
+        publisher.publishEvent(evento);
 
         return new DadosSolicitacaoDTO(solicitacao);
     }
@@ -187,6 +213,15 @@ public class SolicitacaoService {
 
         if (houveMudanca) {
             solicitacao.adicionarAcompanhamentoSistema(mudancas.toString());
+
+            var evento = new DadosNotificacaoPadraoDTO(
+                    solicitacao.getCidadao().getEmail(),
+                    "Solicitação Atualizada - Protocolo " + solicitacao.getProtocolo(),
+                    "Olá " + solicitacao.getCidadao().getNome() + ", informamos que sua solicitação de protocolo " 
+                    + solicitacao.getProtocolo() + " passou por uma reclassificação técnica (Serviço/Prioridade) para melhor atendê-lo. Para mais detalhes, acesse o sistema e confira as atualizações realizadas por nossa equipe técnica. Agradecemos pela compreensão e estamos à disposição para quaisquer dúvidas ou esclarecimentos."
+            );
+
+            publisher.publishEvent(evento);
         }
 
         return new DadosSolicitacaoDTO(solicitacao);
@@ -208,7 +243,7 @@ public class SolicitacaoService {
             "Olá " + solicitacao.getCidadao().getNome() + ", informamos que a solicitação de protocolo " 
             + solicitacao.getProtocolo() + " foi cancelada com sucesso no nosso sistema."
         );
-        
+
         publisher.publishEvent(evento);
 
         return new DadosSolicitacaoDTO(solicitacao);
@@ -223,6 +258,15 @@ public class SolicitacaoService {
         validarPropriedadeDoCidadao(solicitacao, usuarioLogado, "reabrir");
 
         solicitacao.reabrir();
+
+        var evento = new DadosNotificacaoPadraoDTO(
+                solicitacao.getCidadao().getEmail(),
+                "Solicitação Reaberta - Protocolo " + solicitacao.getProtocolo(),
+                "Olá " + solicitacao.getCidadao().getNome() + ", sua solicitação de protocolo " 
+                + solicitacao.getProtocolo() + " foi reaberta com sucesso e retornou para análise da nossa equipe conforme pedido."
+        );
+        
+        publisher.publishEvent(evento);
 
         return new DadosSolicitacaoDTO(solicitacao);
     }
