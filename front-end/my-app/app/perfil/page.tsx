@@ -34,7 +34,7 @@ export default function Perfil() {
 
     async function carregar() {
       try {
-        const res = await fetch("http://protoserv-backend.up.railway.app/usuarios/me", {
+        const res = await fetch("https://protoserv-backend.up.railway.app/usuarios/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -74,7 +74,7 @@ export default function Perfil() {
     const token = localStorage.getItem("token");
     setLoading(true);
     try {
-      const res = await fetch("http://protoserv-backend.up.railway.app/usuarios/me", {
+      const res = await fetch("https://protoserv-backend.up.railway.app/usuarios/me", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -111,7 +111,7 @@ export default function Perfil() {
     const token = localStorage.getItem("token");
     setLoading(true);
     try {
-      const res = await fetch("http://protoserv-backend.up.railway.app/usuarios/me/senha", {
+      const res = await fetch("https://protoserv-backend.up.railway.app/usuarios/me/senha", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

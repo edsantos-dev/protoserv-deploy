@@ -175,7 +175,7 @@ protoserv/
 
 ## 7.API Backend
 
-O frontend consome uma API REST rodando em `http://protoserv-backend.up.railway.app`. Principais endpoints utilizados:
+O frontend consome uma API REST rodando em `https://protoserv-backend.up.railway.app`. Principais endpoints utilizados:
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|

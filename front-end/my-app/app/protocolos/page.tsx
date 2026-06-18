@@ -210,8 +210,8 @@ const [confirmarReabertura, setConfirmarReabertura] = useState(false);
 
       const perfilAtual = p ?? perfil;
       const url = perfilAtual === "CIDADAO"
-        ? "http://protoserv-backend.up.railway.app/solicitacoes/minhas"
-        : "http://protoserv-backend.up.railway.app/solicitacoes";
+        ? "https://protoserv-backend.up.railway.app/solicitacoes/minhas"
+        : "https://protoserv-backend.up.railway.app/solicitacoes";
 
       const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
       if (!response.ok) throw new Error();
@@ -228,7 +228,7 @@ const [confirmarReabertura, setConfirmarReabertura] = useState(false);
     e.stopPropagation();
     try {
       const token = localStorage.getItem("token");
-      await fetch(`http://protoserv-backend.up.railway.app/solicitacoes/${id}/assumir`, {
+      await fetch(`https://protoserv-backend.up.railway.app/solicitacoes/${id}/assumir`, {
         method: "PATCH", headers: { Authorization: `Bearer ${token}` },
       });
       carregarProtocolos();
@@ -241,7 +241,7 @@ async function cancelarSolicitacao(id: number) {
   try {
     const token = localStorage.getItem("token");
 
-    await fetch(`http://protoserv-backend.up.railway.app/solicitacoes/${id}/cancelar`, {
+    await fetch(`https://protoserv-backend.up.railway.app/solicitacoes/${id}/cancelar`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -271,7 +271,7 @@ async function reabrirSolicitacao() {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      `http://protoserv-backend.up.railway.app/solicitacoes/${solicitacao.id}/reabrir`,
+      `https://protoserv-backend.up.railway.app/solicitacoes/${solicitacao.id}/reabrir`,
       {
         method: "PATCH",
         headers: {
@@ -305,7 +305,7 @@ async function reabrirSolicitacao() {
     setNovoStatus("");
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://protoserv-backend.up.railway.app/solicitacoes/${id}`, {
+      const res = await fetch(`https://protoserv-backend.up.railway.app/solicitacoes/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error();
@@ -326,7 +326,7 @@ async function reabrirSolicitacao() {
     if (!solicitacao) return;
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://protoserv-backend.up.railway.app/solicitacoes/${solicitacao.id}`, {
+      const res = await fetch(`https://protoserv-backend.up.railway.app/solicitacoes/${solicitacao.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error();
@@ -342,7 +342,7 @@ async function reabrirSolicitacao() {
       const body: Record<string, string> = { descricao: mensagem.trim(), anexoUrl: "" };
       if (novoStatus) body.novoStatus = novoStatus;
       const res = await fetch(
-        `http://protoserv-backend.up.railway.app/solicitacoes/${solicitacao.id}/acompanhamentos`,
+        `https://protoserv-backend.up.railway.app/solicitacoes/${solicitacao.id}/acompanhamentos`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -368,7 +368,7 @@ async function reabrirSolicitacao() {
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `http://protoserv-backend.up.railway.app/solicitacoes/${solicitacao.id}/acompanhamentos`,
+        `https://protoserv-backend.up.railway.app/solicitacoes/${solicitacao.id}/acompanhamentos`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

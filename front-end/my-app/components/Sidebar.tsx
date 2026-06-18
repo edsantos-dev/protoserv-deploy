@@ -55,7 +55,7 @@ export default function Sidebar() {
 
     async function carregarUsuario() {
       try {
-        const response = await fetch("http://protoserv-backend.up.railway.app/usuarios/me", {
+        const response = await fetch("https://protoserv-backend.up.railway.app/usuarios/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!response.ok) {

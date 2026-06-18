@@ -51,7 +51,7 @@ export default function ProtocolosAtendente() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://protoserv-backend.up.railway.app/solicitacoes", {
+      const response = await fetch("https://protoserv-backend.up.railway.app/solicitacoes", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -80,7 +80,7 @@ export default function ProtocolosAtendente() {
   async function assumirSolicitacao(id: number) {
     try {
       const response = await fetch(
-        `http://protoserv-backend.up.railway.app/solicitacoes/${id}/assumir`,
+        `https://protoserv-backend.up.railway.app/solicitacoes/${id}/assumir`,
         {
           method: "PATCH",
           headers: {

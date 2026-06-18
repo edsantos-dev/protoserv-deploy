@@ -52,7 +52,7 @@ export default function AdminUsuarios() {
     setErro(false);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://protoserv-backend.up.railway.app/usuarios", {
+      const res = await fetch("https://protoserv-backend.up.railway.app/usuarios", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error();
@@ -121,8 +121,8 @@ export default function AdminUsuarios() {
       if (!isEditar || form.senha.trim()) payload.senha = form.senha;
 
       const url = isEditar
-        ? `http://protoserv-backend.up.railway.app/usuarios/${usuarioSelecionado!.id}`
-        : "http://protoserv-backend.up.railway.app/usuarios";
+        ? `https://protoserv-backend.up.railway.app/usuarios/${usuarioSelecionado!.id}`
+        : "https://protoserv-backend.up.railway.app/usuarios";
 
       const res = await fetch(url, {
         method: isEditar ? "PUT" : "POST",
@@ -160,12 +160,12 @@ export default function AdminUsuarios() {
       let res: Response;
 
       if (isAtivo(u)) {
-        res = await fetch(`http://protoserv-backend.up.railway.app/usuarios/inativar/${u.id}`, {
+        res = await fetch(`https://protoserv-backend.up.railway.app/usuarios/inativar/${u.id}`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
         });
       } else {
-        res = await fetch(`http://protoserv-backend.up.railway.app/usuarios/ativar/${u.id}`, {
+        res = await fetch(`https://protoserv-backend.up.railway.app/usuarios/ativar/${u.id}`, {
           method: "PATCH",
           headers: { Authorization: `Bearer ${token}` },
         });
