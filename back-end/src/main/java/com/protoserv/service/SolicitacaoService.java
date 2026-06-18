@@ -1,5 +1,6 @@
 package com.protoserv.service;
 
+import com.protoserv.dto.event.DadosNotificacaoPadraoDTO;
 import com.protoserv.dto.request.DadosAberturaSolicitacaoDTO;
 import com.protoserv.dto.request.DadosNovoAcompanhamentoDTO;
 import com.protoserv.dto.request.DadosReclassificacaoSolicitacaoDTO;
@@ -18,6 +19,7 @@ import com.protoserv.specification.SolicitacaoSpecification;
 
 import jakarta.persistence.EntityNotFoundException;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -37,13 +39,16 @@ public class SolicitacaoService {
     private final SolicitacaoRepository solicitacaoRepository;
     private final ServicoRepository servicoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final ApplicationEventPublisher publisher;
 
     public SolicitacaoService(SolicitacaoRepository solicitacaoRepository,
                               ServicoRepository servicoRepository,
-                              UsuarioRepository usuarioRepository) {
+                              UsuarioRepository usuarioRepository,
+                              ApplicationEventPublisher publisher) {
         this.solicitacaoRepository = solicitacaoRepository;
         this.servicoRepository = servicoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.publisher = publisher;
     }
 
     @Transactional
@@ -196,6 +201,15 @@ public class SolicitacaoService {
         validarPropriedadeDoCidadao(solicitacao, usuarioLogado, "cancelar");
 
         solicitacao.cancelar();
+
+        var evento = new DadosNotificacaoPadraoDTO(
+            solicitacao.getCidadao().getEmail(),
+            "Solicitação Cancelada - Protocolo " + solicitacao.getProtocolo(),
+            "Olá " + solicitacao.getCidadao().getNome() + ", informamos que a solicitação de protocolo " 
+            + solicitacao.getProtocolo() + " foi cancelada com sucesso no nosso sistema."
+        );
+        
+        publisher.publishEvent(evento);
 
         return new DadosSolicitacaoDTO(solicitacao);
     }
