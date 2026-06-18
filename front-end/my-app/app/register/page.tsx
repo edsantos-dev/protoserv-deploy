@@ -17,7 +17,7 @@ export default function RegisterPage() {
 
     try {
       const response = await fetch(
-        "http://localhost:8080/autenticacao/registrar",
+        "http://protoserv-backend.up.railway.app/autenticacao/registrar",
         {
           method: "POST",
           headers: {

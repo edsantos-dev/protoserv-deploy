@@ -42,7 +42,7 @@ export default function AdminServicos() {
     setErro(false);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8080/servicos", {
+      const res = await fetch("http://protoserv-backend.up.railway.app/servicos", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error();
@@ -58,7 +58,7 @@ export default function AdminServicos() {
   async function carregarDetalhe(id: number) {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:8080/servicos/${id}`, {
+      const res = await fetch(`http://protoserv-backend.up.railway.app/servicos/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error();
@@ -123,8 +123,8 @@ export default function AdminServicos() {
       const token = localStorage.getItem("token");
       const isEditar = modoForm === "editar";
       const url = isEditar
-        ? `http://localhost:8080/servicos/${servicoSelecionado!.id}`
-        : "http://localhost:8080/servicos";
+        ? `http://protoserv-backend.up.railway.app/servicos/${servicoSelecionado!.id}`
+        : "http://protoserv-backend.up.railway.app/servicos";
 
       const res = await fetch(url, {
         method: isEditar ? "PUT" : "POST",
@@ -152,7 +152,7 @@ export default function AdminServicos() {
     try {
       const token = localStorage.getItem("token");
       const acao = s.ativo === false ? "ativar" : "desativar";
-      const res = await fetch(`http://localhost:8080/servicos/${s.id}/${acao}`, {
+      const res = await fetch(`http://protoserv-backend.up.railway.app/servicos/${s.id}/${acao}`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
       });

@@ -19,7 +19,7 @@ export default function LoginPage() {
 
     try {
       const response = await fetch(
-        "http://localhost:8080/autenticacao/login",
+        "http://protoserv-backend.up.railway.app/autenticacao/login",
         {
           method: "POST",
           headers: {

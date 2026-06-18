@@ -175,7 +175,7 @@ protoserv/
 
 ## 7.API Backend
 
-O frontend consome uma API REST rodando em `http://localhost:8080`. Principais endpoints utilizados:
+O frontend consome uma API REST rodando em `http://protoserv-backend.up.railway.app`. Principais endpoints utilizados:
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|

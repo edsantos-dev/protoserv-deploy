@@ -34,7 +34,7 @@ export default function Servicos() {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://localhost:8080/servicos", {
+      const res = await fetch("http://protoserv-backend.up.railway.app/servicos", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -110,7 +110,7 @@ export default function Servicos() {
     };
 
     try {
-      const res = await fetch("http://localhost:8080/solicitacoes", {
+      const res = await fetch("http://protoserv-backend.up.railway.app/solicitacoes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
